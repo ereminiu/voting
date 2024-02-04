@@ -3,6 +3,7 @@ package repository
 import (
 	"log/slog"
 
+	"github.com/ereminiu/voting/internal/config"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -17,7 +18,7 @@ type DB struct {
 	conn *sqlx.DB
 }
 
-func NewDB(cfg Config) (*DB, error) {
+func NewDB(cfg *config.Config) (*DB, error) {
 	db, err := NewPostgresDB(cfg)
 	if err != nil {
 		slog.Error("error during connection to db error: ", err)

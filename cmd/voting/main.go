@@ -1,25 +1,30 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"log/slog"
 	"net/http"
 
+	"github.com/ereminiu/voting/internal/config"
 	"github.com/ereminiu/voting/internal/pkg/repository"
 	"github.com/ereminiu/voting/internal/pkg/service"
 	"github.com/gin-gonic/gin"
 )
 
+var mode string
+
+func init() {
+	flag.StringVar(&mode, "mode", "test", "config mode")
+	flag.Parse()
+}
+
 func main() {
-	// TODO: make configs more lovable
-	cfg := repository.NewConfig(
-		"localhost", // "db" for docker compose
-		"5436",      // "5432" for docker compose
-		"postgres",
-		"qwerty",
-		"postgres",
-		"disable",
-	)
+	// load configs
+	cfg, err := config.LoadConfigs(mode)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	db, err := repository.NewDB(cfg)
 	if err != nil {
