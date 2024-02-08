@@ -17,8 +17,8 @@ type Config struct {
 }
 
 const (
-	testPath = "../../config/test/config.yaml"
-	prodPath = "../../config/prod/config.yaml"
+	testPath = "file://config/test/config.yaml"
+	prodPath = "file://config/prod/config.yaml"
 )
 
 func getPath(mode string) (string, error) {

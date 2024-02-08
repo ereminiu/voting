@@ -10,7 +10,10 @@
             "request": "launch",
             "mode": "auto",
             "program": "${fileDirname}",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "env": {
+                "CONFIG_PATH": "../../config/test/config.yaml",
+            }
         }
     ]
 }

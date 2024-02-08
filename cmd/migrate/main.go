@@ -31,7 +31,7 @@ func main() {
 	}
 	// databaseURL := "postgres://ys-user:qwerty@localhost:5432/ys-db?sslmode=disable"
 
-	databaseURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s&sslmode=%s",
+	databaseURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		cfg.Username,
 		cfg.Password,
 		cfg.Host,
