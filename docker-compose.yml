@@ -3,20 +3,24 @@ version: '3.8'
 services:
   voting-app:
     build: ./
-    command: ./wait-for-postgres.sh db ./voting-app
+    command: ./wait-for-postgres.sh db ./voting-app -mode=prod
     ports:
       - 8000:8000
     depends_on:
       - db
     environment:
+      - CONFIG_PATH=config/prod/config.yaml
       - DB_PASSWORD=qwerty
 
   db:
-    restart: unless-stopped
+    restart: always
     image: postgres:latest
     volumes:
-    - ./.database/postgres/data:/var/lib/postgresql/data
+    - pgdata:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=qwerty
     ports:
       - 5436:5432
+
+volumes:
+  pgdata: 

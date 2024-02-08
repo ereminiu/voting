@@ -21,12 +21,11 @@ const (
 	prodPath = "../../config/prod/config.yaml"
 )
 
-// const (
-// 	testPath = "../../config/test/config.yaml"
-// 	prodPath = "../../config/prod/config.yaml"
-// )
-
 func getPath(mode string) (string, error) {
+	envPath := os.Getenv("CONFIG_PATH")
+	if envPath != "" {
+		return envPath, nil
+	}
 	if mode == "test" {
 		return testPath, nil
 	} else if mode == "prod" {
