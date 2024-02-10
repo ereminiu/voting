@@ -52,17 +52,79 @@ func main() {
 
 	router := gin.Default()
 
+	router.POST("/get-result", func(ctx *gin.Context) {
+		var input events.PollFinishingEvent
+		err := ctx.BindJSON(&input)
+		if err != nil {
+			ctx.JSON(400, gin.H{
+				"message": "wrong input format",
+				"error":   err.Error(),
+			})
+			return
+		}
+
+		winnerId, winnerName, err := pollService.GetResults(input)
+		if err != nil {
+			ctx.JSON(500, gin.H{
+				"message": "something went wrong",
+				"error":   err.Error(),
+			})
+		}
+
+		ctx.JSON(200, gin.H{
+			"winner_name": winnerName,
+			"winner_id":   winnerId,
+		})
+	})
+
+	router.POST("/poll", func(ctx *gin.Context) {
+		var input events.VoteEvent
+		err := ctx.BindJSON(&input)
+		if err != nil {
+			ctx.JSON(400, gin.H{
+				"message": "wrong input format",
+				"error":   err.Error(),
+			})
+			return
+		}
+
+		err = pollService.Poll(input)
+		if err != nil {
+			ctx.JSON(500, gin.H{
+				"message": "something went wrong",
+				"error":   err.Error(),
+			})
+		}
+
+		ctx.JSON(200, gin.H{
+			"message": "vote is processed",
+		})
+	})
+
 	router.POST("/create-poll", func(ctx *gin.Context) {
+		log.Info(
+			"creating poll",
+		)
+
 		var input events.PollEvent
 		err := ctx.BindJSON(&input)
 		if err != nil {
+			log.Error(
+				"error",
+				err,
+			)
 			ctx.JSON(400, gin.H{
 				"message": "wrong input format",
 			})
 			return
 		}
+
 		pollId, choiceIds, err := pollService.CreatePoll(input)
 		if err != nil {
+			log.Error(
+				"error",
+				err,
+			)
 			ctx.JSON(500, gin.H{
 				"message": "something went wrong",
 				"error":   err.Error(),
@@ -119,6 +181,6 @@ func main() {
 
 func setupLogger() *slog.Logger {
 	return slog.New(
-		slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
+		slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
 	)
 }

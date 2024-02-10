@@ -11,6 +11,8 @@ type ServiceAdaptor interface {
 	CreateHero(name string) (int, error)
 	GetHeroByID(id int) (string, error)
 	CreatePoll(pollEvent events.PollEvent) (int, []int, error)
+	Poll(poll events.VoteEvent) error
+	GetResults(finishEvent events.PollFinishingEvent) (int, string, error)
 }
 
 type PollService struct {
@@ -20,6 +22,22 @@ type PollService struct {
 
 func NewPollService(db *repository.DB) (*PollService, error) {
 	return &PollService{db: db}, nil
+}
+
+func (pc *PollService) GetResults(finishEvent events.PollFinishingEvent) (int, string, error) {
+	id, name, err := pc.db.GetResults(finishEvent)
+	if err != nil {
+		return -1, "", err
+	}
+	return id, name, nil
+}
+
+func (pc *PollService) Poll(poll events.VoteEvent) error {
+	err := pc.db.Poll(poll)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (pc *PollService) CreatePoll(pollEvent events.PollEvent) (int, []int, error) {
