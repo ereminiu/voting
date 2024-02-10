@@ -17,6 +17,7 @@ services:
     image: postgres:latest
     volumes:
     - pgdata:/var/lib/postgresql/data
+    - ./internal/migrate/migrations/1_init.up.sql:/docker-entrypoint-initdb.d/1_init.up.sql
     environment:
       - POSTGRES_PASSWORD=qwerty
     ports:

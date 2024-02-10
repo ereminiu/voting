@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/ereminiu/voting/internal/config"
 	"github.com/golang-migrate/migrate/v4"
@@ -39,28 +40,38 @@ func main() {
 		cfg.DBName,
 		cfg.SSLMode,
 	)
-	m, err := migrate.New("file://internal/migrate/migrations", databaseURL)
+	// TODO: fix it
+	mpath := "file://internal/migrate/migrations"
+	if envPath := os.Getenv("MIGRATIONS_PATH"); envPath != "" {
+		mpath = envPath
+	}
+	m, err := migrate.New(mpath, databaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	switch cmd {
-	case "up":
-		if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-			log.Fatal(err)
-		}
-		break
-	case "down":
-		if err := m.Down(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-			log.Fatal(err)
-		}
-		break
-	case "force":
-		if err := m.Force(ver); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-			log.Fatal(err)
-		}
-		break
+	// mode, cmd = "test", "up"
+	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		log.Fatal(err)
 	}
+
+	// switch cmd {
+	// case "up":
+	// 	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+	// 		log.Fatal(err)
+	// 	}
+	// 	break
+	// case "down":
+	// 	if err := m.Down(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+	// 		log.Fatal(err)
+	// 	}
+	// 	break
+	// case "force":
+	// 	if err := m.Force(ver); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+	// 		log.Fatal(err)
+	// 	}
+	// 	break
+	// }
 
 	// m.Down() - to discard changes
 	// m.Force() - to fix dirty version of migrations

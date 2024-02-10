@@ -1,20 +1,33 @@
 package service
 
 import (
+	"log/slog"
+
+	"github.com/ereminiu/voting/internal/events"
 	"github.com/ereminiu/voting/internal/pkg/repository"
 )
 
 type ServiceAdaptor interface {
 	CreateHero(name string) (int, error)
 	GetHeroByID(id int) (string, error)
+	CreatePoll(pollEvent events.PollEvent) (int, []int, error)
 }
 
 type PollService struct {
-	db *repository.DB
+	log *slog.Logger
+	db  *repository.DB
 }
 
 func NewPollService(db *repository.DB) (*PollService, error) {
 	return &PollService{db: db}, nil
+}
+
+func (pc *PollService) CreatePoll(pollEvent events.PollEvent) (int, []int, error) {
+	pollId, choiceIds, err := pc.db.CreatePoll(pollEvent)
+	if err != nil {
+		return -1, nil, err
+	}
+	return pollId, choiceIds, err
 }
 
 func (pc *PollService) CreateHero(name string) (int, error) {
